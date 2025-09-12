@@ -1,0 +1,62 @@
+services:
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    networks:
+      - traefik-net
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/traefik.yml:/etc/traefik/traefik.yml"
+      - "./traefik/dynamic.yml:/etc/traefik/dynamic.yml"
+  
+  # auth-service-db:
+  #   image: postgres:16-alpine
+  #   container_name: auth-service-db
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: authdb
+  #   networks:
+  #     - traefik-net
+  #   volumes:
+  #     - auth-service-db-data:/var/lib/postgresql/data
+    
+  
+  auth-service:
+    image: auth-service:latest
+    build: 
+      context: ./backend/auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    networks:
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+    # depends_on:
+    #   - auth-service-db
+
+  frontend:
+    image: frontend:latest
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    networks:
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+    depends_on:
+      - auth-service
+      - traefik
+    
+
+# volumes:
+#   auth-service-db-data:
+
+
+networks:
+  traefik-net:
+    driver: bridge

@@ -1,0 +1,32 @@
+http:
+  middlewares:
+    auth-stripper:
+      stripPrefix:
+        prefixes:
+          - "/api/auth"
+
+  routers:
+    frontend-router:
+      rule: "PathPrefix(`/`)"
+      service: frontend-service
+      entryPoints:
+        - web
+
+    auth-router:
+      rule: "PathPrefix(`/api/auth`)"
+      service: auth-service
+      middlewares:
+        - auth-stripper
+      entryPoints:
+        - web
+  
+  services:
+    frontend-service:
+      loadBalancer:
+        servers:
+          - url: "http://frontend:80"
+
+    auth-service:
+      loadBalancer:
+        servers:
+          - url: "http://auth-service:8000"
