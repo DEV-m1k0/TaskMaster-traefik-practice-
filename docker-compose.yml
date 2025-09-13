@@ -12,17 +12,17 @@ services:
       - "./traefik/traefik.yml:/etc/traefik/traefik.yml"
       - "./traefik/dynamic.yml:/etc/traefik/dynamic.yml"
   
-  # auth-service-db:
-  #   image: postgres:16-alpine
-  #   container_name: auth-service-db
-  #   environment:
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: postgres
-  #     POSTGRES_DB: authdb
-  #   networks:
-  #     - traefik-net
-  #   volumes:
-  #     - auth-service-db-data:/var/lib/postgresql/data
+  auth-service-db:
+    image: postgres:16-alpine
+    container_name: auth-service-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
+    networks:
+      - traefik-net
+    volumes:
+      - auth-service-db-data:/var/lib/postgresql/data
     
   
   auth-service:
@@ -35,8 +35,9 @@ services:
       - traefik-net
     labels:
       - "traefik.enable=true"
-    # depends_on:
-    #   - auth-service-db
+    depends_on:
+      - traefik
+      - auth-service-db
 
   frontend:
     image: frontend:latest
@@ -53,9 +54,8 @@ services:
       - traefik
     
 
-# volumes:
-#   auth-service-db-data:
-
+volumes:
+  auth-service-db-data:
 
 networks:
   traefik-net:
