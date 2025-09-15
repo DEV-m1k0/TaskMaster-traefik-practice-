@@ -1,15 +1,14 @@
 from models import User
 from database import SessionLocal, Base, engine
-from sqlalchemy import MetaData
 
 async def init_db():
     Base.metadata.create_all(bind=engine)
     with SessionLocal() as session:
         if not session.query(User).first():
-            user1 = User(username="user1", password="user1")
-            user2 = User(username="user2", password="user2")
+            admin = User(username="admin", password="admin", first_name="John", last_name="Doe", role="admin")
+            user = User(username="user", password="user", first_name="Jane", last_name="Miller", role="user")
             
-            session.add_all([user1, user2])
+            session.add_all([admin, user])
             session.commit()
 
 

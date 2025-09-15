@@ -1,5 +1,7 @@
 import axios from "axios"
 import { useState } from "react"
+import { useAuth } from "./UseAuth"
+
 
 function Login() {
 
@@ -16,19 +18,10 @@ function Login() {
         })
     }
 
-    const btnOnClickHandler = async () => {
-        const username = formData.username
-        const password = formData.password
+    const { login } = useAuth();
 
-        try {
-            const response = await axios.post('/api/auth/login', {
-                "username": username,
-                "password": password
-            })
-            console.log(response.data)
-        } catch (error) {
-            console.error('Error during login:', error)
-        }
+    const btnOnClickHandler = async () => {
+        login(formData)
     }
 
     const checkHealth = async () => {

@@ -15,14 +15,35 @@ services:
   auth-service-db:
     image: postgres:16-alpine
     container_name: auth-service-db
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: auth_db
+      POSTGRES_HOST: auth-service-db
+      POSTGRES_PORT: 5432
     networks:
       - traefik-net
     volumes:
       - auth-service-db-data:/var/lib/postgresql/data
+
+  auth-service-pgadmin:
+    image: dpage/pgadmin4
+    container_name: auth-service-pgadmin
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@localhost.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - auth-service-db
+    networks:
+      - traefik-net
     
   
   auth-service:
@@ -56,6 +77,7 @@ services:
 
 volumes:
   auth-service-db-data:
+  pgadmin-data:
 
 networks:
   traefik-net:
